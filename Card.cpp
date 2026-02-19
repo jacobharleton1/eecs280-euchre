@@ -93,20 +93,7 @@ std::istream & operator>>(std::istream &is, Suit &suit) {
 
 /////////////// Write your implementation for Card below ///////////////
 
-
-// NOTE: We HIGHLY recommend you check out the operator overloading
-// tutorial in the project spec before implementing
-// the following operator overload functions:
-//   operator<<
-//   operator>>
-//   operator<
-//   operator<=
-//   operator>
-//   operator>=
-//   operator==
-//   operator!=
-
-//////////////////// Card member functions ////////////////////
+// card members functions
 
 //EFFECTS Initializes Card to the Two of Spades
 Card::Card() {
@@ -160,75 +147,130 @@ bool Card::is_left_bower(Suit trump) const {
 //EFFECTS Returns true if the card is a trump card. All cards of the trump
 // suit are trump cards. The left bower is also a trump card.
 bool Card::is_trump(Suit trump) const {
-  assert(false);
+  if (suit == trump) return true;
+  if (is_left_bower(trump)) return true;
+  return false;
 }
 
-//////////////////// Stream operators ////////////////////
+// stream operators 
 
 //EFFECTS Prints Card to stream, for example "Two of Spades"
 std::ostream & operator<<(std::ostream &os, const Card &card) {
-  assert(false);
+  os << card.get_rank() << " of " << card.get_suit();
   return os;
 }
 
 //EFFECTS Reads a Card from a stream in the format "Two of Spades"
 std::istream & operator>>(std::istream &is, Card &card) {
-  assert(false);
+  string suit_in;
+  string rank_in;
+  string trash;
+  is >> rank_in >> trash >> suit_in; 
+  card = Card(string_to_rank(rank_in), string_to_suit(suit_in));
   return is;
 }
 
-//////////////////// Comparisons (no trump) ////////////////////
+//comparison operators
 
 //EFFECTS Returns true if lhs is lower value than rhs.
 // Does not consider trump.
 bool operator<(const Card &lhs, const Card &rhs) {
-  assert(false);
+  if (lhs.get_rank() < rhs.get_rank()) return true;
+  if (lhs.get_rank() == rhs.get_rank()) {
+    if (lhs.get_suit() < rhs.get_suit()) return true;
+  }
+  return false;
 }
 
 //EFFECTS Returns true if lhs is lower value than rhs or the same card as rhs.
 // Does not consider trump.
 bool operator<=(const Card &lhs, const Card &rhs) {
-  assert(false);
+  return !(rhs < lhs);
 }
 
 //EFFECTS Returns true if lhs is higher value than rhs.
 // Does not consider trump.
 bool operator>(const Card &lhs, const Card &rhs) {
-  assert(false);
+  return rhs < lhs;
 }
 
 //EFFECTS Returns true if lhs is higher value than rhs or the same card as rhs.
 // Does not consider trump.
 bool operator>=(const Card &lhs, const Card &rhs) {
-  assert(false);
+  return !(lhs < rhs);
 }
 
 //EFFECTS Returns true if lhs is same card as rhs.
 // Does not consider trump.
 bool operator==(const Card &lhs, const Card &rhs) {
-  assert(false);
+  if (lhs.get_rank() == rhs.get_rank() && lhs.get_suit() == rhs.get_suit()) {
+    return true;
+  }
+  return false;
 }
 
 //EFFECTS Returns true if lhs is not the same card as rhs.
 // Does not consider trump.
 bool operator!=(const Card &lhs, const Card &rhs) {
-  assert(false);
+  return !(lhs == rhs);
 }
 
-//////////////////// Helper functions ////////////////////
+// other functions
 
 //EFFECTS returns the next suit, which is the suit of the same color
 Suit Suit_next(Suit suit) {
-  assert(false);
+  Suit next = static_cast<Suit>((suit + 2) % 4);
+  return next;
 }
 
 //EFFECTS Returns true if a is lower value than b. Uses trump to determine order.
 bool Card_less(const Card &a, const Card &b, Suit trump) {
-  assert(false);
+  if (b.is_right_bower(trump)) return true;
+
+  else if (a.is_right_bower(trump)) return false;
+
+  else if (b.is_left_bower(trump)) return true;
+
+  else if (a.is_left_bower(trump)) return false;
+
+  else if (b.is_trump(trump) && a.is_trump(trump)) return a < b;
+
+  else if (b.is_trump(trump)) return true;
+
+  else if (a.is_trump(trump)) return false;
+
+  return a < b;
+
 }
 
 //EFFECTS Returns true if a is lower value than b. Uses both the trump suit
 // and the suit led to determine order.
 bool Card_less(const Card &a, const Card &b, const Card &led_card, Suit trump) {
-  assert(false);
+  Suit led_suit = led_card.get_suit();
+  if (led_card.is_left_bower(trump)) led_suit = trump;
+
+
+  if (b.is_right_bower(trump)) return true;
+
+  else if (a.is_right_bower(trump)) return false;
+
+  else if (b.is_left_bower(trump)) return true;
+
+  else if (a.is_left_bower(trump)) return false;
+
+  else if (b.is_trump(trump) && a.is_trump(trump)) return a < b;
+
+  else if (b.is_trump(trump)) return true;
+
+  else if (a.is_trump(trump)) return false;
+
+  else if (b.get_suit() == led_suit && a.get_suit() == led_suit) {
+    return a < b;
+  }
+
+  else if (b.get_suit() == led_suit) return true;
+
+  else if (a.get_suit() == led_suit) return false;
+
+  return a < b;
 }
