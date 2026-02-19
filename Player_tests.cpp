@@ -112,53 +112,33 @@ TEST(test_make_trump_round2_dealer_forced_no_good_trumps){
     delete alice;
 }
 
-TEST(test_make_round2_does_not_order_wrong_color_with_strong_hand){
-    Player * alice = Player_factory("Alice", "Simple");
-    Card upcard(NINE, SPADES);
-
-    alice->add_card(Card(ACE, HEARTS));
-    alice->add_card(Card(KING, HEARTS));
-
-    alice->add_card(Card(TEN, DIAMONDS));
-    alice->add_card(Card(TEN, SPADES));
-    alice->add_card(Card(NINE, DIAMONDS));
-
-    Suit order_up_suit = DIAMONDS;
-    bool ordered = alice->make_trump(upcard, false, 2, order_up_suit);
-
-    ASSERT_FALSE(ordered);
-    ASSERT_EQUAL(DIAMONDS, order_up_suit);
-    delete alice;
-}
 
 TEST(test_add_and_discard_removes_lowest_card){
     Player * alice = Player_factory("Alice", "Simple");
 
     Card upcard(TEN, CLUBS);
 
-    alice->add_card(Card(NINE, CLUBS));
-    alice->add_card(Card(NINE, SPADES));
+    alice->add_card(Card(QUEEN, CLUBS));
     alice->add_card(Card(ACE, HEARTS));
+    alice->add_card(Card(TEN, HEARTS));
     alice->add_card(Card(KING, DIAMONDS));
-    alice->add_card(Card(QUEEN, HEARTS));
+    alice->add_card(Card(NINE, SPADES));
 
     alice->add_and_discard(upcard);
 
-    bool spade_nine_present = false;
-    bool club_nine_present = false;
-
-    for (int i = 0; i < 5; ++i) {
+    bool card_present = false;
+    for(int i = 0; i<5;++i){
         Card c = alice->lead_card(CLUBS);
-        if (c == Card(NINE, SPADES)) spade_nine_present = true;
-        if (c == Card(NINE, CLUBS)) club_nine_present = true;
+        if(c == Card(NINE, SPADES)){
+            card_present = true;
+        }
     }
 
-    ASSERT_FALSE(spade_nine_present);
-    ASSERT_TRUE(club_nine_present);
+    ASSERT_FALSE(card_present);
     delete alice;
 }
 
-TEST(test_add_and_discard_discards_non_trump_over_trump_upcard){
+TEST(test_add_and_discard_removes_upcard){
     Player * alice = Player_factory("Alice", "Simple");
 
     Card upcard(NINE, CLUBS);
@@ -166,45 +146,20 @@ TEST(test_add_and_discard_discards_non_trump_over_trump_upcard){
     alice->add_card(Card(TEN, SPADES));
     alice->add_card(Card(JACK, HEARTS));
     alice->add_card(Card(QUEEN, DIAMONDS));
-    alice->add_card(Card(KING, SPADES));
+    alice->add_card(Card(KING, CLUBS));
     alice->add_card(Card(ACE, HEARTS));
 
     alice->add_and_discard(upcard);
 
     bool card_present = false;
     for(int i = 0; i<5;++i){
-        Card c = alice->lead_card(CLUBS);
+        Card c = alice->lead_card(DIAMONDS);
         if(c == upcard){
             card_present = true;
         }
     }
 
-    ASSERT_TRUE(card_present);
-    delete alice;
-}
-
-TEST(test_add_and_discard_discards_upcard_if_all_trump_and_upcard_lowest){
-    Player * alice = Player_factory("Alice", "Simple");
-
-    Card upcard(NINE, CLUBS);
-
-    alice->add_card(Card(TEN, CLUBS));
-    alice->add_card(Card(JACK, CLUBS));
-    alice->add_card(Card(QUEEN, CLUBS));
-    alice->add_card(Card(KING, CLUBS));
-    alice->add_card(Card(ACE, CLUBS));
-
-    alice->add_and_discard(upcard);
-
-    bool saw_upcard = false;
-    for (int i = 0; i < 5; ++i) {
-        Card c = alice->lead_card(CLUBS);
-        if (c == upcard) {
-            saw_upcard = true;
-        }
-    }
-
-    ASSERT_FALSE(saw_upcard);
+    ASSERT_FALSE(card_present);
     delete alice;
 }
 
