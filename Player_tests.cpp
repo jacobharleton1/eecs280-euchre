@@ -143,11 +143,11 @@ TEST(test_add_and_discard_removes_upcard){
 
     Card upcard(NINE, CLUBS);
 
-    alice->add_card(Card(QUEEN, CLUBS));
-    alice->add_card(Card(ACE, HEARTS));
-    alice->add_card(Card(TEN, HEARTS));
-    alice->add_card(Card(KING, DIAMONDS));
     alice->add_card(Card(TEN, SPADES));
+    alice->add_card(Card(JACK, HEARTS));
+    alice->add_card(Card(QUEEN, DIAMONDS));
+    alice->add_card(Card(KING, CLUBS));
+    alice->add_card(Card(ACE, HEARTS));
 
     alice->add_and_discard(upcard);
 
