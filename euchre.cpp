@@ -11,13 +11,12 @@ class Game {
     public:
     
     Game(std::istream &pack_input,
-        const std::string &shuffle_type,
-        const std::string &name1, const std::string &type1,
-        const std::string &name2, const std::string &type2,
-        const std::string &name3, const std::string &type3,
-        const std::string &name4, const std::string &type4)
-        : pack(pack_input)
-    {
+        const string &shuffle_type, int points_goal_in,
+        const string &name1, const string &type1, const string &name2, 
+        const string &type2, const string &name3, const string &type3,
+        const string &name4, const string &type4)
+        : pack(pack_input), points_goal(points_goal_in) {
+      
         do_shuffle = (shuffle_type == "shuffle");
         dealer = 0;
         hand_number = 0;
@@ -39,12 +38,16 @@ class Game {
         }
     }
 
-    void play(int points_goal){
+    void play() {
         while(team1_points < points_goal && team2_points < points_goal){
             play_hand();
             dealer = (dealer + 1) % 4;
             hand_number = hand_number + 1;
         }
+        if (team1_points > points_goal) {
+            cout << players[0] << " and " << players[2] << " win!";
+        }
+        else cout << players[1] << " and " << players[3] << " win!";
     }
 
     private:
@@ -59,8 +62,10 @@ class Game {
         bool trump_set;
         Suit trump;
         Card upcard;
+        int points_goal;
 
     private:
+
         void shuffle(){
             if(do_shuffle){
                 pack.shuffle();
@@ -103,13 +108,14 @@ class Game {
         
         }
         void play_hand(/* ... */) {
-
+            //Chris will do this
         }
 
         void choose_trump() {
             //implementation of logic for how player chooses lead suit
             //break into either human --> prompt ask
             // or simple robot i.e. go through their hand or sum idk
+            // Jacob can you do since you know player better than me
         }
 
 };
@@ -161,8 +167,8 @@ int main(int argc, char **argv) {
     }
 
     // Read command line args and check for errors
-    Game game(pack_file, shuff_type, name1,
+    Game game(pack_file, shuff_type, points_to_win, name1,
               type1, name2, type2, name3, type3, name4, type4);
-    game.play(points_to_win);
+    game.play();
     
 }
