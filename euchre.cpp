@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 #include "Pack.hpp"
 #include "Card.hpp"
 #include "Player.hpp"
@@ -30,10 +31,6 @@ class Game {
         players.push_back(Player_factory(name2, type2));
         players.push_back(Player_factory(name3, type3));
         players.push_back(Player_factory(name4, type4));
-    }
-
-    ~Game(){
-
     }
 
     ~Game(){
@@ -115,16 +112,12 @@ class Game {
             // or simple robot i.e. go through their hand or sum idk
         }
 
-}
+};
 
 
 int main(int argc, char **argv) {
-    string pack_filename = argv[1];
-    string shuff_type = argv[2];
-    int points_to_win = stoi(argv[3]);
     bool error = false;
     
-
     if (argc != 12) {
         cout << "Usage: euchre.exe PACK_FILENAME [shuffle|noshuffle] "
         << "POINTS_TO_WIN NAME1 TYPE1 NAME2 TYPE2 NAME3 TYPE3 "
@@ -132,20 +125,23 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    else if (shuff_type != "shuffle" && shuff_type != "noshuffle") error = true;
+    string pack_filename = argv[1];
+    string shuff_type = argv[2];
+    int points_to_win = stoi(argv[3]);
+
+
+    if (shuff_type != "shuffle" && shuff_type != "noshuffle") error = true;
     else if (points_to_win < 1 || points_to_win > 100) error = true;
 
-    // loop through to make sure each player type is human or simple
     for (int i = 5; i < 12; i += 2) {
         string type = argv[i];
         if (type != "Simple" && type != "Human") error = true;
     }
-    
-    // if any generated error will show as true and print error message
+
     if (error) {
         cout << "Usage: euchre.exe PACK_FILENAME [shuffle|noshuffle] "
-        << "POINTS_TO_WIN NAME1 TYPE1 NAME2 TYPE2 NAME3 TYPE3 "
-        << "NAME4 TYPE4" << endl;
+            << "POINTS_TO_WIN NAME1 TYPE1 NAME2 TYPE2 NAME3 TYPE3 "
+            << "NAME4 TYPE4" << endl;
         return 1;
     }
 
@@ -164,13 +160,9 @@ int main(int argc, char **argv) {
     return 1;
     }
 
+    // Read command line args and check for errors
+    Game game(pack_file, shuff_type, name1,
+              type1, name2, type2, name3, type3, name4, type4);
+    game.play(points_to_win);
     
-
-  // Read command line args and check for errors
-  Game game(pack_filename, shuff_type, name1, type1, name2, type2, name3, type3, name4, type4);
-  game.play(points_to_win);
-
-  for (size_t i = 0; i < players.size(); ++i) {
-    delete players[i];
-    }
 }
