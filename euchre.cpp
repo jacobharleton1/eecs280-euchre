@@ -9,101 +9,111 @@ using namespace std;
 class Game {
     public:
     
-    Game(ifstream &pack_file, const string &shuffle_type, const string &name1,
-        const string &type1, const string &name2, const string &type2, 
-        const string &name3, const string &type3, const string &name4, 
-        const string &type4) {
-
-        Pack game_pack(pack_file);
-        vector<Player*> players;
+    Game(std::istream &pack_input,
+        const std::string &shuffle_type,
+        const std::string &name1, const std::string &type1,
+        const std::string &name2, const std::string &type2,
+        const std::string &name3, const std::string &type3,
+        const std::string &name4, const std::string &type4)
+        : pack(pack_input)
+    {
+        do_shuffle = (shuffle_type == "shuffle");
+        dealer = 0;
+        hand_number = 0;
+        team1_points = 0;
+        team2_points = 0;
+        trump_maker = -1;
+        trump_set = false;
+        trump = SPADES;
 
         players.push_back(Player_factory(name1, type1));
         players.push_back(Player_factory(name2, type2));
         players.push_back(Player_factory(name3, type3));
         players.push_back(Player_factory(name4, type4));
-
-        if (shuffle_type == "shuffle") game_pack.shuffle();
     }
 
+    ~Game(){
 
-    void play(int points_to_win) {
-        int hand = 0;
-        int team1_points = 0;
-        int team2_points = 0;
-        const int num_tricks_per_hand = 5;
-        int dealer = 0;
-        const int player_num = 4;
-        int round = 0;
+    }
 
-        while (team1_points < points_to_win && team2_points < points_to_win) {
-
-        for (int i = 0; i < num_tricks_per_hand) {
-            deal(dealer);
-            Card upcard = pack.deal_one();
-
-            for (int i = 0; i < player_num; i++) {
-
-                if (players[(dealer+i+1)%4].make_trump(upcard, dealer, round, upcard.get_suit())) {
-                    players[(dealer+i+1)%4].add_and_discard(upcard);
-                }
-
-            }
-
-        }
-
-
+    ~Game(){
+        for (Player *player : players){
+            delete player;
         }
     }
 
+    void play(int points_goal){
+        while(team1_points < points_goal && team2_points < points_goal){
+            play_hand();
+            dealer = (dealer + 1) % 4;
+            hand_number = hand_number + 1;
+        }
+    }
 
     private:
-    std::vector<Player*> players;
-    Pack pack;
-    // ...
+        std::vector<Player*> players;
+        Pack pack;
+        bool do_shuffle;
+        int dealer;
+        int hand_number;
+        int team1_points;
+        int team2_points;
+        int trump_maker;
+        bool trump_set;
+        Suit trump;
+        Card upcard;
 
-    void shuffle() {
-        pack.shuffle();
-    }
-  
-    void deal(int dealer) {
-        const int player_number = 4;
-        int order[4] = {
-            (dealer + 1)%4,
-            (dealer + 2)%4,
-            (dealer + 3)%4,
-            dealer};
-
-        int first[4] = {3,2,3,2};
-        int second[4] = {2,3,2,3};
-
-        //dealing first time around
-        for (int i = 0; i < player_number; i++) {
-            for (int j = 0; j < first[i]; j++) {
-                players[order[i]]->add_card(pack.deal_one());
+    private:
+        void shuffle(){
+            if(do_shuffle){
+                pack.shuffle();
             }
         }
 
-        //dealing first time around
-        for (int i = 0; i < player_number; i++) {
-            for (int j = 0; j < second[i]; j++) {
-                players[order[i]]->add_card(pack.deal_one());
-            }
+        void reset_hand(){
+            trump_maker = -1;
+            trump_set = false;
         }
+
+        void deal(int dealer) {
+            const int player_number = 4;
+            int order[4] = {
+                (dealer + 1)%4,
+                (dealer + 2)%4,
+                (dealer + 3)%4,
+                dealer};
+
+            int first[4] = {3,2,3,2};
+            int second[4] = {2,3,2,3};
+
+            //dealing first time around
+            for (int i = 0; i < player_number; i++) {
+                for (int j = 0; j < first[i]; j++) {
+                    players[order[i]]->add_card(pack.deal_one());
+                }
+            }
+
+            //dealing first time around
+            for (int i = 0; i < player_number; i++) {
+                for (int j = 0; j < second[i]; j++) {
+                    players[order[i]]->add_card(pack.deal_one());
+                }
+            }
+            
+        }
+
+        void make_trump(int suit) {
         
-    }
+        }
+        void play_hand(/* ... */) {
 
-    void make_trump(int suit) {
-        
-    }
-    void play_hand(/* ... */) {
+        }
 
-    }
-
-    void choose_trump() {
-        //implementation of logic for how player chooses lead suit
-        //break into either human --> prompt ask
-        // or simple robot i.e. go through their hand or sum idk
-    }
+        void choose_trump() {
+            //implementation of logic for how player chooses lead suit
+            //break into either human --> prompt ask
+            // or simple robot i.e. go through their hand or sum idk
+        }
 
 }
 
