@@ -28,7 +28,6 @@ class Game {
         trump = SPADES;
         team1_tricks = 0;
         team2_tricks = 0;
-        tricks_played = 0;
 
         players.push_back(Player_factory(name1, type1));
         players.push_back(Player_factory(name2, type2));
@@ -44,7 +43,6 @@ class Game {
 
     void play() {
         int leader = (dealer+1)%4;
-        tricks_played = 0;
 
         while(team1_points < points_goal && team2_points < points_goal){
             //choose_trump(players[(dealer+1)%4]);
@@ -53,38 +51,80 @@ class Game {
 
             team1_tricks = 0;
             team2_tricks = 0;
-            tricks_played = 0;
 
-            while(tricks_played < 5) {
-                play_hand(leader, trump);
-                tricks_played++;
-            }
-            //if team 1 chooses trump
-            if (chose_trump == 0 || chose_trump == 2) {
-                if (team1_tricks == 3 || team1_tricks == 4) ++team1_points;
-                else if (team1_tricks == 5) team1_points +=2;
-                else if (team2_tricks >= 3) team2_points +=2;
-            }
+            pack.reset();
+            shuffle();
+            deal();
+            
+            upcard = pack.deal_one();
+            cout << upcard << " turned up" << endl;
 
-            //if team 2 chooses trump
-            else {
-                if (team2_tricks == 3 || team2_tricks == 4) team2_points +=1;
-                else if (team2_tricks == 5) team2_points +=2;
-                else if (team1_tricks >= 3) team1_points+=2;
+            choose_trump();
+
+            leader = (dealer + 1)%4;
+            for (int trick_num = 0; trick_num < 5; ++trick_num){
+                leader = play_hand(leader, trump);
             }
 
+            int maker_team = (chose_trump % 2);
+            int maker_tricks;
 
+            if(maker_team == 0){
+                maker_tricks = team1_tricks;
+            }else{
+                maker_tricks = team2_tricks;
+            }
+
+            if(team1_tricks > team2_tricks){
+                cout << players[0]->get_name() << " and " << players[2]->get_name()
+                << " win the hand" << endl;
+            }else{
+                cout << players[1]->get_name() << " and " << players[3]->get_name()
+                << " win the hand" << endl;
+            }
+
+            if (maker_tricks >= 3){
+                if(maker_tricks == 5){
+                    if(maker_team == 0){
+                        team1_points = team1_points + 2;
+                    }else{
+                        team2_points = team2_points + 2;
+                    }
+                    cout << "march!" << endl;
+                }else{
+                    if(maker_team == 0){
+                        team1_points = team1_points + 1;
+                    }else{
+                        team2_points = team2_points + 1;
+                    }
+                }
+            }else{
+                if(maker_team == 0){
+                    team2_points = team2_points + 2;
+                }else{
+                    team1_points = team1_points + 2;
+                }
+                cout << "euchred!" << endl;
+
+            }
+
+
+            cout << players[0]->get_name() << " and " << players[2]->get_name()
+            << " have " << team1_points << " points" << endl;
+            cout << players[1]->get_name() << " and " << players[3]->get_name()
+            << " have " << team2_points << " points" << endl; 
+
+            cout << endl;
             dealer = (dealer + 1) % 4;
-            leader = (dealer+1)%4;
-            hand_number +=1;
-            team1_tricks = 0;
-            team2_tricks = 0;
-            tricks_played = 0;
+            hand_number++;
+
         }
+
         if (team1_points >= points_goal) {
-            cout << players[0] << " and " << players[2] << " win!";
+            cout << players[0]->get_name() << " and " << players[2]->get_name() << " win!" << endl;
         }
-        else cout << players[1] << " and " << players[3] << " win!";
+        else cout << players[1]->get_name() << " and " << players[3]->get_name() << " win!" << endl;
+
     }
 
     private:
@@ -102,7 +142,6 @@ class Game {
         int points_goal;
         int team1_tricks;
         int team2_tricks;
-        int tricks_played;
         int chose_trump;
 
     private:
@@ -148,12 +187,23 @@ class Game {
         void make_trump(int suit) {
             
         }
-        void play_hand(int leader, Suit trump) {
+
+        int play_hand(int leader, Suit trump) {
 
             Card c1 = players[leader]->lead_card(trump);
-            Card c2 = players[(leader+1)%4]->play_card(c1, trump);
-            Card c3 = players[(leader+2)%4]->play_card(c1, trump);
-            Card c4 = players[(leader+3)%4]->play_card(c1, trump);
+            cout << c1 << " led by " << players[leader]->get_name() << endl;
+
+            int player2 = (leader + 1)%4;
+            int player3 = (leader + 2)%4;
+            int player4 = (leader + 3)%4;
+            
+            Card c2 = players[player2]->play_card(c1, trump);
+            Card c3 = players[player3]->play_card(c1, trump);
+            Card c4 = players[player4]->play_card(c1, trump);
+
+            cout << c2 << " played by " << players[player2]->get_name() << endl;
+            cout << c3 << " played by " << players[player3]->get_name() << endl;
+            cout << c4 << " played by " << players[player4]->get_name() << endl;
 
             array<Card,4> handcards = {c1, c2, c3, c4};
 
@@ -162,19 +212,20 @@ class Game {
 
             for (size_t i = 1; i < handcards.size(); ++i) {
                 if (Card_less(winning_card, handcards[i], c1, trump)) {
-                winning_card = handcards[i];
-                winner_offset = static_cast<int>(i);
+                    winning_card = handcards[i];
+                    winner_offset = static_cast<int>(i);
                 }
             }
 
             int winner = (leader + winner_offset) % 4;
 
-            cout << players[winner]->get_name() << " takes the trick\n";
+            cout << players[winner]->get_name() << " takes the trick" << endl;
+            cout << endl;
 
             if (winner == 0 || winner == 2) team1_tricks++;
             else team2_tricks++;
 
-            tricks_played++;
+            return winner;
         }
 
         void choose_trump() {
