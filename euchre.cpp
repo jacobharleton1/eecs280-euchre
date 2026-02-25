@@ -14,7 +14,14 @@ struct Game_config {
 
     string name[4];
     string type[4];
+    
 };
+
+void error_message() {
+    cout << "Usage: euchre.exe PACK_FILENAME [shuffle|noshuffle] "
+    << "POINTS_TO_WIN NAME1 TYPE1 NAME2 TYPE2 NAME3 TYPE3 "
+    << "NAME4 TYPE4" << endl;
+}
 
 class Game {
     public:
@@ -283,13 +290,12 @@ class Game {
 };
 
 
+
 int main(int argc, char **argv) {
     bool error = false;
     
     if (argc != 12) {
-        cout << "Usage: euchre.exe PACK_FILENAME [shuffle|noshuffle] "
-        << "POINTS_TO_WIN NAME1 TYPE1 NAME2 TYPE2 NAME3 TYPE3 "
-        << "NAME4 TYPE4" << endl;
+        error_message();
         return 1;
     }
 
@@ -307,33 +313,22 @@ int main(int argc, char **argv) {
     }
 
     if (error) {
-        cout << "Usage: euchre.exe PACK_FILENAME [shuffle|noshuffle] "
-            << "POINTS_TO_WIN NAME1 TYPE1 NAME2 TYPE2 NAME3 TYPE3 "
-            << "NAME4 TYPE4" << endl;
+        error_message();
         return 1;
     }
-
-    string name1 = argv[4];
-    string type1 = argv[5];
-    string name2 = argv[6];
-    string type2 = argv[7];
-    string name3 = argv[8];
-    string type3 = argv[9];
-    string name4 = argv[10];
-    string type4 = argv[11];
 
     Game_config cfg;
     cfg.do_shuffle = (shuff_type == "shuffle");
     cfg.points_goal = points_to_win;
 
-    cfg.name[0] = name1; 
-    cfg.type[0] = type1;
-    cfg.name[1] = name2; 
-    cfg.type[1] = type2;
-    cfg.name[2] = name3; 
-    cfg.type[2] = type3;
-    cfg.name[3] = name4; 
-    cfg.type[3] = type4;
+    cfg.name[0] = argv[4]; 
+    cfg.type[0] = argv[5];
+    cfg.name[1] = argv[6]; 
+    cfg.type[1] = argv[7];
+    cfg.name[2] = argv[8]; 
+    cfg.type[2] = argv[9];
+    cfg.name[3] = argv[10]; 
+    cfg.type[3] = argv[11];
 
     ifstream pack_file(pack_filename);
     if (!pack_file) {
