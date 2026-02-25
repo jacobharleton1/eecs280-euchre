@@ -322,6 +322,10 @@ int main(int argc, char **argv) {
     return 1;
     }
 
+    for (int i = 0; i < argc; i++) {
+        cout << argv[i] << " ";
+    }
+    
     // Read command line args and check for errors
     Game game(pack_file, shuff_type, points_to_win, name1,
               type1, name2, type2, name3, type3, name4, type4);
