@@ -48,8 +48,8 @@ class Game {
 
         while(team1_points < points_goal && team2_points < points_goal){
             //choose_trump(players[(dealer+1)%4]);
-            cout << "Hand " << hand_number;
-            cout << players[dealer] << " deals";
+            cout << "Hand " << hand_number << endl;
+            cout << players[dealer]->get_name() << " deals" << endl;
 
             team1_tricks = 0;
             team2_tricks = 0;
@@ -146,7 +146,7 @@ class Game {
         }
 
         void make_trump(int suit) {
-        // don't know what this wants
+            
         }
         void play_hand(int leader, Suit trump) {
 
@@ -178,13 +178,48 @@ class Game {
         }
 
         void choose_trump() {
-            //implementation of logic for how player chooses lead suit
-            //break into either human --> prompt ask
-            // or simple robot i.e. go through their hand or sum idk
-            // Jacob can you do since you know player better than me
-            // return whoever chose trump into int chose_trump b/c i use it above
-        }
+            trump_set = false;
+            chose_trump = -1;
+            trump_maker = -1;
+            Suit order_up_suit = upcard.get_suit();
 
+            for(int player_index = 0; player_index<4; ++player_index){
+                int player_of_focus = (dealer + 1 + player_index) % 4;
+                bool is_dealer = (player_of_focus == dealer);
+
+                if(players[player_of_focus]->make_trump(upcard, is_dealer, 1, order_up_suit)){
+                    trump = order_up_suit;
+                    trump_set = true;
+                    chose_trump = player_of_focus;
+                    trump_maker = player_of_focus;
+
+                    cout << players[player_of_focus]->get_name() << " orders up " 
+                    << trump << "\n\n";
+                    players[dealer]->add_and_discard(upcard);
+                    return;
+                }else{
+                    cout << players[player_of_focus]->get_name() << " passes" << endl;
+                }
+            }
+
+            for(int player_index = 0; player_index<4; ++player_index){
+                int player_of_focus = (dealer + 1 + player_index) % 4;
+                bool is_dealer = (player_of_focus == dealer);
+
+                if(players[player_of_focus]->make_trump(upcard, is_dealer, 2, order_up_suit)){
+                    trump = order_up_suit;
+                    trump_set = true;
+                    chose_trump = player_of_focus;
+                    trump_maker = player_of_focus;
+
+                    cout << players[player_of_focus]->get_name() << " orders up "
+                    << trump << "\n\n";
+                    return;
+                }else{
+                    cout << players[player_of_focus]->get_name() << " passes" << endl;
+                }
+            }
+        }
 };
 
 
