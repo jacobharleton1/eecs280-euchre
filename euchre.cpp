@@ -341,7 +341,7 @@ int main(int argc, char **argv) {
     return 1;
     }
 
-    cout << " ./euchre.exe ";
+    cout << "./euchre.exe ";
     for (int i = 1; i < argc; i++) {
         cout << argv[i] << " ";
     }
