@@ -137,29 +137,51 @@ TEST(test_add_and_discard_removes_lowest_card){
     ASSERT_FALSE(card_present);
     delete alice;
 }
+TEST(test_add_and_discard_behavior){
 
-TEST(test_add_and_discard_removes_upcard){
-    Player * alice = Player_factory("Alice", "Simple");
-
+    Player * alice;
     Card upcard(NINE, CLUBS);
 
-    alice->add_card(Card(TEN, SPADES));
-    alice->add_card(Card(JACK, HEARTS));
-    alice->add_card(Card(QUEEN, DIAMONDS));
+    // Case 1: upcard is the lowest trump
+    alice = Player_factory("Alice", "Simple");
+
+    alice->add_card(Card(TEN, CLUBS));
+    alice->add_card(Card(QUEEN, CLUBS));
     alice->add_card(Card(KING, CLUBS));
-    alice->add_card(Card(ACE, HEARTS));
+    alice->add_card(Card(ACE, CLUBS));
+    alice->add_card(Card(JACK, CLUBS));
 
     alice->add_and_discard(upcard);
 
-    bool card_present = false;
-    for(int i = 0; i<5;++i){
-        Card c = alice->lead_card(DIAMONDS);
-        if(c == upcard){
-            card_present = true;
-        }
+    bool found_upcard = false;
+    for(int i = 0; i < 5; ++i){
+        Card c = alice->lead_card(CLUBS);
+        if (c == upcard) found_upcard = true;
     }
 
-    ASSERT_FALSE(card_present);
+    ASSERT_FALSE(found_upcard);
+    delete alice;
+
+
+    // Case 2: lowest non-trump card discarded
+    alice = Player_factory("Alice", "Simple");
+
+    alice->add_card(Card(ACE, CLUBS));
+    alice->add_card(Card(KING, CLUBS));
+    alice->add_card(Card(ACE, HEARTS));
+    alice->add_card(Card(TEN, SPADES));
+    alice->add_card(Card(NINE, DIAMONDS));
+
+    alice->add_and_discard(upcard);
+
+    bool found_low_card = false;
+    for(int i = 0; i < 5; ++i){
+        Card c = alice->lead_card(CLUBS);
+        if(c == Card(NINE, DIAMONDS))
+            found_low_card = true;
+    }
+
+    ASSERT_FALSE(found_low_card);
     delete alice;
 }
 
