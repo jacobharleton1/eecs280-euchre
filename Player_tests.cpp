@@ -137,6 +137,7 @@ TEST(test_add_and_discard_removes_lowest_card){
     ASSERT_FALSE(card_present);
     delete alice;
 }
+
 TEST(test_add_and_discard_removes_upcard){
 
     Player * alice;

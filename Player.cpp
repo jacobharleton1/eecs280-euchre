@@ -53,10 +53,11 @@ class SimplePlayer : public Player {
         
         void add_and_discard(const Card &upcard) override {
             hand.push_back(upcard);
+            Suit trump = upcard.get_suit();
 
             size_t lowest_card_index = 0;
             for (size_t i = 1; i < hand.size(); ++i){
-                if (hand[i] < hand[lowest_card_index]){
+                if (Card_less(hand[i], hand[lowest_card_index], trump)) {
                     lowest_card_index = i;
                 }
             }
