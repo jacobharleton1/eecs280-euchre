@@ -71,50 +71,21 @@ class Game {
 
             if(maker_team == 0){
                 maker_tricks = team1_tricks;
-            }else{
+            }
+            else{
                 maker_tricks = team2_tricks;
             }
 
             if(team1_tricks > team2_tricks){
                 cout << players[0]->get_name() << " and " << players[2]->get_name()
                 << " win the hand" << endl;
-            }else{
+            }
+            else{
                 cout << players[1]->get_name() << " and " << players[3]->get_name()
                 << " win the hand" << endl;
             }
 
-            if (maker_tricks >= 3){
-                if(maker_tricks == 5){
-                    if(maker_team == 0){
-                        team1_points = team1_points + 2;
-                    }else{
-                        team2_points = team2_points + 2;
-                    }
-                    cout << "march!" << endl;
-                }else{
-                    if(maker_team == 0){
-                        team1_points = team1_points + 1;
-                    }else{
-                        team2_points = team2_points + 1;
-                    }
-                }
-            }else{
-                if(maker_team == 0){
-                    team2_points = team2_points + 2;
-                }else{
-                    team1_points = team1_points + 2;
-                }
-                cout << "euchred!" << endl;
-
-            }
-
-
-            cout << players[0]->get_name() << " and " << players[2]->get_name()
-            << " have " << team1_points << " points" << endl;
-            cout << players[1]->get_name() << " and " << players[3]->get_name()
-            << " have " << team2_points << " points" << endl; 
-
-            cout << endl;
+            scoring(maker_tricks, maker_team);
             dealer = (dealer + 1) % 4;
             hand_number++;
 
@@ -124,9 +95,10 @@ class Game {
             cout << players[0]->get_name() << " and " 
             << players[2]->get_name() << " win!" << endl;
         }
-        else cout << players[1]->get_name() << " and " 
+        else {
+            cout << players[1]->get_name() << " and " 
         << players[3]->get_name() << " win!" << endl;
-
+        }
     }
 
     private:
@@ -147,6 +119,32 @@ class Game {
         int chose_trump;
 
     private:
+
+        void scoring(int maker_tricks, int maker_team) {
+            if (maker_tricks < 3) {
+                if (maker_team == 0) team2_points += 2;
+                else team1_points += 2;
+                cout << "euchred!" << endl;
+            }
+            else if (maker_tricks == 5) {
+                if (maker_team == 0) team1_points += 2;
+                else team2_points += 2;
+                cout << "march!" << endl;
+            }
+            else {
+                if (maker_team == 0) team1_points += 1;
+                else team2_points += 1;
+            }
+            cout << players[0]->get_name() << " and "
+            << players[2]->get_name()
+            << " have " << team1_points << " points" << endl;
+
+            cout << players[1]->get_name() << " and "
+            << players[3]->get_name()
+            << " have " << team2_points << " points" << endl;
+
+            cout << endl;
+        }
 
         void shuffle(){
             if(do_shuffle){
