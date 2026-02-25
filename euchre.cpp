@@ -121,9 +121,11 @@ class Game {
         }
 
         if (team1_points >= points_goal) {
-            cout << players[0]->get_name() << " and " << players[2]->get_name() << " win!" << endl;
+            cout << players[0]->get_name() << " and " 
+            << players[2]->get_name() << " win!" << endl;
         }
-        else cout << players[1]->get_name() << " and " << players[3]->get_name() << " win!" << endl;
+        else cout << players[1]->get_name() << " and " 
+        << players[3]->get_name() << " win!" << endl;
 
     }
 
@@ -238,7 +240,8 @@ class Game {
                 int player_of_focus = (dealer + 1 + player_index) % 4;
                 bool is_dealer = (player_of_focus == dealer);
 
-                if(players[player_of_focus]->make_trump(upcard, is_dealer, 1, order_up_suit)){
+                if(players[player_of_focus]->make_trump(upcard, is_dealer, 
+                    1, order_up_suit)){
                     trump = order_up_suit;
                     trump_set = true;
                     chose_trump = player_of_focus;
@@ -249,7 +252,8 @@ class Game {
                     players[dealer]->add_and_discard(upcard);
                     return;
                 }else{
-                    cout << players[player_of_focus]->get_name() << " passes" << endl;
+                    cout << players[player_of_focus]->get_name() 
+                    << " passes" << endl;
                 }
             }
 
@@ -257,7 +261,8 @@ class Game {
                 int player_of_focus = (dealer + 1 + player_index) % 4;
                 bool is_dealer = (player_of_focus == dealer);
 
-                if(players[player_of_focus]->make_trump(upcard, is_dealer, 2, order_up_suit)){
+                if(players[player_of_focus]->make_trump(upcard,
+                     is_dealer, 2, order_up_suit)){
                     trump = order_up_suit;
                     trump_set = true;
                     chose_trump = player_of_focus;
