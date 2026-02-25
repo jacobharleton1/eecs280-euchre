@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <array>
 #include "Pack.hpp"
 #include "Card.hpp"
 #include "Player.hpp"
@@ -25,6 +26,9 @@ class Game {
         trump_maker = -1;
         trump_set = false;
         trump = SPADES;
+        team1_tricks = 0;
+        team2_tricks = 0;
+        tricks_played = 0;
 
         players.push_back(Player_factory(name1, type1));
         players.push_back(Player_factory(name2, type2));
@@ -39,12 +43,45 @@ class Game {
     }
 
     void play() {
+        int leader = (dealer+1)%4;
+        tricks_played = 0;
+
         while(team1_points < points_goal && team2_points < points_goal){
-            play_hand();
+            //choose_trump(players[(dealer+1)%4]);
+            cout << "Hand " << hand_number;
+            cout << players[dealer] << " deals";
+
+            team1_tricks = 0;
+            team2_tricks = 0;
+            tricks_played = 0;
+
+            while(tricks_played < 5) {
+                play_hand(leader, trump);
+                tricks_played++;
+            }
+            //if team 1 chooses trump
+            if (chose_trump == 0 || chose_trump == 2) {
+                if (team1_tricks == 3 || team1_tricks == 4) ++team1_points;
+                else if (team1_tricks == 5) team1_points +=2;
+                else if (team2_tricks >= 3) team2_points +=2;
+            }
+
+            //if team 2 chooses trump
+            else {
+                if (team2_tricks == 3 || team2_tricks == 4) team2_points +=1;
+                else if (team2_tricks == 5) team2_points +=2;
+                else if (team1_tricks >= 3) team1_points+=2;
+            }
+
+
             dealer = (dealer + 1) % 4;
-            hand_number = hand_number + 1;
+            leader = (dealer+1)%4;
+            hand_number +=1;
+            team1_tricks = 0;
+            team2_tricks = 0;
+            tricks_played = 0;
         }
-        if (team1_points > points_goal) {
+        if (team1_points >= points_goal) {
             cout << players[0] << " and " << players[2] << " win!";
         }
         else cout << players[1] << " and " << players[3] << " win!";
@@ -63,6 +100,10 @@ class Game {
         Suit trump;
         Card upcard;
         int points_goal;
+        int team1_tricks;
+        int team2_tricks;
+        int tricks_played;
+        int chose_trump;
 
     private:
 
@@ -77,7 +118,7 @@ class Game {
             trump_set = false;
         }
 
-        void deal(int dealer) {
+        void deal() {
             const int player_number = 4;
             int order[4] = {
                 (dealer + 1)%4,
@@ -105,10 +146,35 @@ class Game {
         }
 
         void make_trump(int suit) {
-        
+        // don't know what this wants
         }
-        void play_hand(/* ... */) {
-            //Chris will do this
+        void play_hand(int leader, Suit trump) {
+
+            Card c1 = players[leader]->lead_card(trump);
+            Card c2 = players[(leader+1)%4]->play_card(c1, trump);
+            Card c3 = players[(leader+2)%4]->play_card(c1, trump);
+            Card c4 = players[(leader+3)%4]->play_card(c1, trump);
+
+            array<Card,4> handcards = {c1, c2, c3, c4};
+
+            int winner_offset = 0;
+            Card winning_card = handcards[0];
+
+            for (size_t i = 1; i < handcards.size(); ++i) {
+                if (Card_less(winning_card, handcards[i], c1, trump)) {
+                winning_card = handcards[i];
+                winner_offset = static_cast<int>(i);
+                }
+            }
+
+            int winner = (leader + winner_offset) % 4;
+
+            cout << players[winner]->get_name() << " takes the trick\n";
+
+            if (winner == 0 || winner == 2) team1_tricks++;
+            else team2_tricks++;
+
+            tricks_played++;
         }
 
         void choose_trump() {
@@ -116,6 +182,7 @@ class Game {
             //break into either human --> prompt ask
             // or simple robot i.e. go through their hand or sum idk
             // Jacob can you do since you know player better than me
+            // return whoever chose trump into int chose_trump b/c i use it above
         }
 
 };
