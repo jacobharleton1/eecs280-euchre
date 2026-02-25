@@ -8,17 +8,22 @@
 #include "Player.hpp"
 using namespace std;
 
+struct Game_config {
+    bool do_shuffle;
+    int points_goal;
+
+    string name[4];
+    string type[4];
+};
+
 class Game {
     public:
     
-    Game(std::istream &pack_input,
-        const string &shuffle_type, int points_goal_in,
-        const string &name1, const string &type1, const string &name2, 
-        const string &type2, const string &name3, const string &type3,
-        const string &name4, const string &type4)
-        : pack(pack_input), points_goal(points_goal_in) {
-      
-        do_shuffle = (shuffle_type == "shuffle");
+    Game(std::istream &pack_input, const Game_config &cfg)
+    : pack(pack_input),
+      do_shuffle(cfg.do_shuffle),
+      points_goal(cfg.points_goal) {
+    
         dealer = 0;
         hand_number = 0;
         team1_points = 0;
@@ -28,11 +33,12 @@ class Game {
         trump = SPADES;
         team1_tricks = 0;
         team2_tricks = 0;
+        chose_trump = -1;
 
-        players.push_back(Player_factory(name1, type1));
-        players.push_back(Player_factory(name2, type2));
-        players.push_back(Player_factory(name3, type3));
-        players.push_back(Player_factory(name4, type4));
+        //num of players is 4
+        for (int i = 0; i < 4; i++) {
+        players.push_back(Player_factory(cfg.name[i], cfg.type[i]));
+        }
     }
 
     ~Game(){
@@ -316,19 +322,33 @@ int main(int argc, char **argv) {
     string name4 = argv[10];
     string type4 = argv[11];
 
+    Game_config cfg;
+    cfg.do_shuffle = (shuff_type == "shuffle");
+    cfg.points_goal = points_to_win;
+
+    cfg.name[0] = name1; 
+    cfg.type[0] = type1;
+    cfg.name[1] = name2; 
+    cfg.type[1] = type2;
+    cfg.name[2] = name3; 
+    cfg.type[2] = type3;
+    cfg.name[3] = name4; 
+    cfg.type[3] = type4;
+
     ifstream pack_file(pack_filename);
     if (!pack_file) {
         cout << "Error opening " << pack_filename << endl;
     return 1;
     }
 
-    for (int i = 0; i < argc; i++) {
+    cout << " ./euchre.exe ";
+    for (int i = 1; i < argc; i++) {
         cout << argv[i] << " ";
     }
-    
+    cout << endl;
+
     // Read command line args and check for errors
-    Game game(pack_file, shuff_type, points_to_win, name1,
-              type1, name2, type2, name3, type3, name4, type4);
+    Game game(pack_file, cfg);
     game.play();
     
 }
