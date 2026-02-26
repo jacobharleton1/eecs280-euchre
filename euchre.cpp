@@ -316,11 +316,29 @@ class Game {
     }
 };
 
+int run_game(const string &pack_filename,
+             int argc,
+             char **argv,
+             const Game_config &cfg) {
+    ifstream pack_file(pack_filename);
+    if (!pack_file) {
+        cout << "Error opening " << pack_filename << endl;
+        return 1;
+    }
 
+    cout << "./euchre.exe ";
+    for (int i = 1; i < argc; i++) {
+        cout << argv[i] << " ";
+    }
+    cout << endl;
+
+    Game game(pack_file, cfg);
+    game.play();
+
+    return 0;
+}
 
 int main(int argc, char **argv) {
-    bool error = false;
-    
     if (argc != 12) {
         error_message();
         return 1;
@@ -330,47 +348,32 @@ int main(int argc, char **argv) {
     string shuff_type = argv[2];
     int points_to_win = stoi(argv[3]);
 
+    if (shuff_type != "shuffle" && shuff_type != "noshuffle") {
+        error_message();
+        return 1;
+    }
 
-    if (shuff_type != "shuffle" && shuff_type != "noshuffle") error = true;
-    else if (points_to_win < 1 || points_to_win > 100) error = true;
+    if (points_to_win < 1 || points_to_win > 100) {
+        error_message();
+        return 1;
+    }
 
     for (int i = 5; i < 12; i += 2) {
         string type = argv[i];
-        if (type != "Simple" && type != "Human") error = true;
-    }
-
-    if (error) {
-        error_message();
-        return 1;
+        if (type != "Simple" && type != "Human") {
+            error_message();
+            return 1;
+        }
     }
 
     Game_config cfg;
     cfg.do_shuffle = (shuff_type == "shuffle");
     cfg.points_goal = points_to_win;
 
-    cfg.name[0] = argv[4]; 
-    cfg.type[0] = argv[5];
-    cfg.name[1] = argv[6]; 
-    cfg.type[1] = argv[7];
-    cfg.name[2] = argv[8]; 
-    cfg.type[2] = argv[9];
-    cfg.name[3] = argv[10]; 
-    cfg.type[3] = argv[11];
+    cfg.name[0] = argv[4];  cfg.type[0] = argv[5];
+    cfg.name[1] = argv[6];  cfg.type[1] = argv[7];
+    cfg.name[2] = argv[8];  cfg.type[2] = argv[9];
+    cfg.name[3] = argv[10]; cfg.type[3] = argv[11];
 
-    ifstream pack_file(pack_filename);
-    if (!pack_file) {
-        cout << "Error opening " << pack_filename << endl;
-    return 1;
-    }
-
-    cout << "./euchre.exe ";
-    for (int i = 1; i < argc; i++) {
-        cout << argv[i] << " ";
-    }
-    cout << endl;
-
-    // Read command line args and check for errors
-    Game game(pack_file, cfg);
-    game.play();
-   
+    return run_game(pack_filename, argc, argv, cfg);
 }
