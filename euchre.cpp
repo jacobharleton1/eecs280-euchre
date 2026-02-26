@@ -211,11 +211,10 @@ class Game {
             int player4 = (leader + 3)%4;
             
             Card c2 = players[player2]->play_card(c1, trump);
-            Card c3 = players[player3]->play_card(c1, trump);
-            Card c4 = players[player4]->play_card(c1, trump);
-
             cout << c2 << " played by " << players[player2]->get_name() << endl;
+            Card c3 = players[player3]->play_card(c1, trump);
             cout << c3 << " played by " << players[player3]->get_name() << endl;
+            Card c4 = players[player4]->play_card(c1, trump);
             cout << c4 << " played by " << players[player4]->get_name() << endl;
 
             array<Card,4> handcards = {c1, c2, c3, c4};
@@ -247,45 +246,40 @@ class Game {
             trump_maker = -1;
             Suit order_up_suit = upcard.get_suit();
 
-            for(int player_index = 0; player_index<4; ++player_index){
-                int player_of_focus = (dealer + 1 + player_index) % 4;
-                bool is_dealer = (player_of_focus == dealer);
+            for(int round = 1; round <= 2; ++round){
+                for(int player_index = 0; player_index<4; ++player_index){
+                    int player_of_focus = (dealer + 1 + player_index) % 4;
+                    bool is_dealer = (player_of_focus == dealer);
 
-                if(players[player_of_focus]->make_trump(upcard, is_dealer, 
-                    1, order_up_suit)){
-                    trump = order_up_suit;
-                    trump_set = true;
-                    chose_trump = player_of_focus;
-                    trump_maker = player_of_focus;
+                    if(players[player_of_focus]->make_trump(upcard, is_dealer, 
+                        round, order_up_suit)){
+                        trump = order_up_suit;
+                        trump_set = true;
+                        chose_trump = player_of_focus;
+                        trump_maker = player_of_focus;
 
-                    cout << players[player_of_focus]->get_name() << " orders up " 
-                    << trump << "\n\n";
-                    players[dealer]->add_and_discard(upcard);
-                    return;
-                }else{
-                    cout << players[player_of_focus]->get_name() 
-                    << " passes" << endl;
+                        cout << players[player_of_focus]->get_name() << " orders up " 
+                        << trump << "\n\n";
+
+                        if(round == 1) players[dealer]->add_and_discard(upcard);
+        
+                        return;
+                    }else{
+                        cout << players[player_of_focus]->get_name() 
+                        << " passes" << endl;
+                    }
                 }
             }
 
-            for(int player_index = 0; player_index<4; ++player_index){
-                int player_of_focus = (dealer + 1 + player_index) % 4;
-                bool is_dealer = (player_of_focus == dealer);
+            if(!trump_set){
+                trump = Suit_next(upcard.get_suit());
+                trump_set = true;
+                chose_trump = dealer;
+                trump_maker = dealer;
 
-                if(players[player_of_focus]->make_trump(upcard,
-                     is_dealer, 2, order_up_suit)){
-                    trump = order_up_suit;
-                    trump_set = true;
-                    chose_trump = player_of_focus;
-                    trump_maker = player_of_focus;
-
-                    cout << players[player_of_focus]->get_name() << " orders up "
-                    << trump << "\n\n";
-                    return;
-                }else{
-                    cout << players[player_of_focus]->get_name() << " passes" << endl;
-                }
+                cout << players[dealer]->get_name() << " orders up " << trump << "\n\n";
             }
+
         }
 };
 
